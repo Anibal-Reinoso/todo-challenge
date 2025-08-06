@@ -19,5 +19,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include('task_manager.api_urls', 'api'), name='api'),
     path('', include('task_manager.urls')),
 ]

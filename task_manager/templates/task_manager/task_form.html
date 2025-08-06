@@ -1,0 +1,11 @@
+<form 
+  hx-post="/tasks/create/" 
+  hx-target="#task-list" 
+  hx-swap="beforeend" 
+  hx-on="htmx:afterRequest: document.getElementById('modal').style.display = 'none'">
+
+  {% csrf_token %}
+  {{ form.as_p }}
+
+  <button type="submit">Crear</button>
+</form>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Task Manager</title>
+  <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+</head>
+<body>
+  <h1>Listado de tareas</h1>
+
+  <!-- ✅ Botón para abrir el modal de creación -->
+  <button hx-get="/tasks/create-form/" hx-target="#modal-content" hx-trigger="click">Nueva tarea</button>
+
+  <!-- ✅ Lista de tareas -->
+  <div id="task-list" hx-get="/tasks/" hx-trigger="load">
+    <!-- Aquí se insertará la lista desde el backend -->
+  </div>
+
+  <!-- ✅ Modal simple -->
+  <div id="modal" style="display:none;">
+    <div id="modal-content"></div>
+    <button onclick="document.getElementById('modal').style.display='none'">Cerrar</button>
+  </div>
+
+  <script>
+    // Mostrar el modal cuando se recibe contenido
+    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
+      if (evt.detail.target.id === 'modal-content') {
+        document.getElementById('modal').style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

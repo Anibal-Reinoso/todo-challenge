@@ -1,0 +1,31 @@
+{% for task in tasks %}
+  <div id="task-{{ task.id }}">
+    <span>{{ task.title }}</span>
+    {% if task.completed %}
+      <strong>[Completada]</strong>
+    {% else %}
+      <em>[Pendiente]</em>
+    {% endif %}
+
+    <!-- Botón para eliminar la tarea -->
+    <button 
+      hx-delete="/api/tasks/{{ task.id }}/" 
+      hx-target="#task-{{ task.id }}" 
+      hx-swap="outerHTML">
+      Eliminar
+    </button>
+
+    <!-- Botón para marcar como completada -->
+    {% if not task.completed %}
+      <button 
+        hx-patch="/api/tasks/{{ task.id }}/" 
+        hx-vals='{"completed": true}' 
+        hx-target="#task-{{ task.id }}" 
+        hx-swap="outerHTML">
+        Marcar como completada
+      </button>
+    {% endif %}
+  </div>
+{% empty %}
+  <p>No hay tareas aún.</p>
+{% endfor %}
