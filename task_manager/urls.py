@@ -7,7 +7,13 @@ router.register(r'tasks', views.TaskViewSet, basename='task')
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('tasks/create/', views.task_create_view, name='task_create'),
-    path('tasks/<int:task_id>/edit/', views.task_update_view, name='task_edit'),
-    path('tasks/<int:task_id>/delete/', views.task_delete_view, name='task_delete'),
+    path('tasks/create/', views.TaskCreateView.as_view(), name='task_create'),
+    path('tasks/create/form/', views.TaskCreateFormView.as_view(), name='task_create_form'),
+    path('tasks/<int:task_id>/edit/', views.TaskUpdateView.as_view(), name='task_edit'),
+    path('tasks/<int:task_id>/delete/', views.TaskDeleteView.as_view(), name='task_delete'),
+
+    # login modal
+    path('login/form/', views.login_form_view, name='login_form'),
+    path('login-submit/', views.login_submit_view, name='login_submit'),
+    path('logout/', views.logout_view, name='logout_view'),
 ]

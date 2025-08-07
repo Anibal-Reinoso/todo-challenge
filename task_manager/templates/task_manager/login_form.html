@@ -1,0 +1,9 @@
+<form method="post"
+      hx-post="{% url 'login_submit' %}"
+      hx-target="#login-section"
+      hx-swap="outerHTML">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+  <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+</form>

@@ -1,0 +1,17 @@
+<!-- task_manager/components/login_button.html -->
+<button class="btn btn-outline-secondary mb-3"
+        hx-get="{% url 'login_form' %}"
+        hx-target="#modal-body"
+        hx-trigger="click">
+    Iniciar sesión
+</button>
+{% if user.is_authenticated %}
+    <button class="btn btn-outline-secondary mb-3"
+            hx-get="{% url 'index' %}"
+            hx-target="#login-section"
+            hx-swap="outerHTML">
+        Cerrar sesión
+    </button>
+{% else %}
+    {% include "task_manager/login_button.html" %}
+{% endif %}

@@ -12,12 +12,40 @@
   <body class="container py-5">
     <h1 class="mb-4">Mis Tareas</h1>
 
+    {% if user and user.is_authenticated %}
+      <div id="login-section">
+        <form method="post"
+              hx-post="{% url 'logout_view' %}"
+              hx-target="#login-section"
+              hx-swap="outerHTML"
+              style="display: inline;">
+          {% csrf_token %}
+          <span class="text-success">
+            Sesión iniciada como {{ user.username }}
+          </span>
+          <button type="submit" class="btn btn-sm btn-outline-danger ms-2">
+            Cerrar sesión
+          </button>
+        </form>
+      </div>
+    {% elif user and not user.is_authenticated %}
+      <div id="login-section">
+        <button class="btn btn-outline-secondary mb-3"
+                hx-get="{% url 'login_form' %}"
+                hx-target="#modal-body"
+                hx-trigger="click">
+          Iniciar sesión
+        </button>
+      </div>
+    {% endif %}
+
     <!-- Botón para crear nueva tarea -->
     <button
       class="btn btn-primary mb-3"
       hx-get="{% url 'task_create' %}"
       hx-target="#modal-body"
       hx-trigger="click"
+      {% if not user.is_authenticated %}disabled{% endif %}
     >
       + Nueva tarea
     </button>
@@ -29,6 +57,7 @@
           name="created_at"
           class="form-control"
           value="{{ request.GET.created_at }}"
+          {% if not user.is_authenticated %}disabled{% endif %}
         />
       </div>
       <div class="col-auto">
@@ -38,10 +67,15 @@
           class="form-control"
           placeholder="Buscar por contenido"
           value="{{ request.GET.q }}"
+          {% if not user.is_authenticated %}disabled{% endif %}
         />
       </div>
       <div class="col-auto">
-        <button type="submit" class="btn btn-outline-primary">Filtrar</button>
+        <button type="submit"
+                class="btn btn-outline-primary"
+                {% if not user.is_authenticated %}disabled{% endif %}>
+          Filtrar
+        </button>
       </div>
     </form>
 
@@ -104,6 +138,33 @@
           e.detail.xhr.status === 204
         ) {
           htmx.trigger(htmx.find("#task-list"), "load");
+        }
+      });
+
+      function cerrarModal() {
+        document.getElementById("modal").classList.remove("show");
+        document.getElementById("modal").style.display = "none";
+        document.getElementById("modal-backdrop").classList.remove("show");
+        document.getElementById("modal-backdrop").style.display = "none";
+        document.getElementById("modal-body").innerHTML = "";
+      }
+
+      document.body.addEventListener("htmx:afterRequest", (e) => {
+        if (
+          e.detail.target.id === "login-section" &&
+          e.detail.xhr.response.includes("Sesión iniciada como")
+        ) {
+          cerrarModal();
+          setTimeout(() => {
+            location.reload();
+          }, 300);
+        }
+      });
+
+      document.body.addEventListener('htmx:configRequest', function (event) {
+        const token = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (token) {
+          event.detail.headers['X-CSRFToken'] = token.value;
         }
       });
     </script>
