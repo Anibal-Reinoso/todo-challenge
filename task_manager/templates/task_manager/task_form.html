@@ -1,11 +1,7 @@
-<form 
-  hx-post="/tasks/create/" 
-  hx-target="#task-list" 
-  hx-swap="beforeend" 
-  hx-on="htmx:afterRequest: document.getElementById('modal').style.display = 'none'">
-
+<form method="post"
+      hx-post="{% if task %}{% url 'task_edit' task.id %}{% else %}{% url 'task_create' %}{% endif %}">
   {% csrf_token %}
   {{ form.as_p }}
-
-  <button type="submit">Crear</button>
+  <button type="submit" class="btn btn-primary">Guardar</button>
+  <button type="button" class="btn btn-secondary" onclick="document.getElementById('modal').style.display='none'; document.getElementById('modal-backdrop').style.display='none';">Cancelar</button>
 </form>

@@ -1,34 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Task Manager</title>
-  <script src="https://unpkg.com/htmx.org@1.9.5"></script>
-</head>
-<body>
-  <h1>Listado de tareas</h1>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gestor de Tareas</title>
+    <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    />
+  </head>
+  <body class="container py-5">
+    <h1 class="mb-4">Mis Tareas</h1>
 
-  <!-- ✅ Botón para abrir el modal de creación -->
-  <button hx-get="/tasks/create-form/" hx-target="#modal-content" hx-trigger="click">Nueva tarea</button>
+    <!-- Botón para crear nueva tarea -->
+    <button
+      class="btn btn-primary mb-3"
+      hx-get="{% url 'task_create' %}"
+      hx-target="#modal-body"
+      hx-trigger="click"
+    >
+      + Nueva tarea
+    </button>
 
-  <!-- ✅ Lista de tareas -->
-  <div id="task-list" hx-get="/tasks/" hx-trigger="load">
-    <!-- Aquí se insertará la lista desde el backend -->
-  </div>
+    <form method="get" class="row g-2 mb-4">
+      <div class="col-auto">
+        <input
+          type="date"
+          name="created_at"
+          class="form-control"
+          value="{{ request.GET.created_at }}"
+        />
+      </div>
+      <div class="col-auto">
+        <input
+          type="text"
+          name="q"
+          class="form-control"
+          placeholder="Buscar por contenido"
+          value="{{ request.GET.q }}"
+        />
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary">Filtrar</button>
+      </div>
+    </form>
 
-  <!-- ✅ Modal simple -->
-  <div id="modal" style="display:none;">
-    <div id="modal-content"></div>
-    <button onclick="document.getElementById('modal').style.display='none'">Cerrar</button>
-  </div>
+    <!-- Lista de tareas -->
+    <div id="task-list" hx-trigger="load" hx-swap="innerHTML">
+      {% for task in tasks %} {% include "task_manager/task_item.html" %}
+      {% endfor %}
+    </div>
 
-  <script>
-    // Mostrar el modal cuando se recibe contenido
-    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
-      if (evt.detail.target.id === 'modal-content') {
-        document.getElementById('modal').style.display = 'block';
-      }
-    });
-  </script>
-</body>
+    <!-- Modal para formulario de creación/edición -->
+    <div
+      class="modal fade"
+      id="modal"
+      tabindex="-1"
+      style="display: none"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-body" id="modal-body">
+            <!-- Aquí se inyecta el formulario -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fondo del modal (para estilo fade) -->
+    <div
+      id="modal-backdrop"
+      class="modal-backdrop fade"
+      style="display: none"
+    ></div>
+
+    <script>
+      document.body.addEventListener("htmx:afterSwap", (e) => {
+        if (e.detail.target.id === "modal-body") {
+          document.getElementById("modal").classList.add("show");
+          document.getElementById("modal").style.display = "block";
+          document.getElementById("modal-backdrop").classList.add("show");
+          document.getElementById("modal-backdrop").style.display = "block";
+        }
+      });
+
+      document.body.addEventListener("htmx:afterRequest", (e) => {
+        // Cerrar modal luego de crear/editar tarea
+        if (
+          e.detail.target.id === "modal-body" &&
+          e.detail.xhr.response.includes("task-item")
+        ) {
+          document.getElementById("modal").classList.remove("show");
+          document.getElementById("modal").style.display = "none";
+          document.getElementById("modal-backdrop").classList.remove("show");
+          document.getElementById("modal-backdrop").style.display = "none";
+          document.getElementById("modal-body").innerHTML = "";
+          htmx.trigger(htmx.find("#task-list"), "load"); // refrescar lista
+        }
+        // Refrescar lista tras eliminar tarea
+        if (
+          e.detail.target.classList.contains("card") &&
+          e.detail.xhr.status === 204
+        ) {
+          htmx.trigger(htmx.find("#task-list"), "load");
+        }
+      });
+    </script>
+  </body>
 </html>
