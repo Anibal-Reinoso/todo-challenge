@@ -1,22 +1,20 @@
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
-from django.views.decorators.http import require_http_methods
+from django.views.generic.edit import CreateView, UpdateView, FormView
+from django.views.generic.base import TemplateView
+from django.views import View
+from django.urls import reverse_lazy
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
 from .forms import TaskForm
 from .models import Task
 from .serializers import TaskSerializer
 import logging
-from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic.base import TemplateView
-from django.views.generic.list import ListView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views import View
 
 logger = logging.getLogger('tareas')
 
@@ -102,28 +100,32 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
         logger.info(f"Tarea actualizada por {self.request.user.username}, ID={task.id}, titulo={task.title}")
         return htmx_redirect('/')
 
-@require_http_methods(["GET"])
-def login_form_view(request):
-    form = AuthenticationForm()
-    return render(request, 'task_manager/login_form.html', {'form': form})
+class LoginView(FormView):
+    template_name = 'task_manager/login_form.html'
+    form_class = AuthenticationForm
+    success_url = reverse_lazy('index')
 
-@require_http_methods(["POST"])
-def login_submit_view(request):
-    form = AuthenticationForm(data=request.POST)
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
 
-    if form.is_valid():
-        login(request, form.get_user())
+    def form_valid(self, form):
+        user = form.get_user()
+        login(self.request, user)
 
-        if request.headers.get('Hx-Request') == 'true':
-            html = render_to_string('task_manager/login_success.html', {'user': form.get_user()})
+        if self.request.headers.get('Hx-Request') == 'true':
+            html = render_to_string('task_manager/login_success.html', {'user': user})
             return HttpResponse(html)
-        return redirect('index')
-    return render(request, 'task_manager/login_form.html', {'form': form})
 
-@require_http_methods(["POST"])
-def logout_view(request):
-    logout(request)
-    if request.headers.get("Hx-Request") == "true":
-        html = render_to_string('task_manager/login_button.html')
-        return HttpResponse(html)
-    return redirect('index')
+        return redirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+class LogoutView(View):
+    def post(self, request):
+        logout(request)
+        if request.headers.get('Hx-Request') == 'true':
+            return htmx_redirect('/')
+        return redirect('index')

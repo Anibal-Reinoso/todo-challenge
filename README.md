@@ -1,37 +1,46 @@
-# Invera ToDo-List Challenge (Python/Django Jr-SSr)
+# Todolist
+Todolist es una aplicación de gestión de tareas desarrollada con **Django** y **Django REST Framework**, que incluye autenticación de usuarios, API REST, panel de administración y frontend interactivo mediante **HTMX**.  
+La aplicación está diseñada para ejecutarse en contenedores usando **Docker Compose**, lo que facilita la configuración y despliegue en entornos locales y de producción.
 
-El propósito de esta prueba es conocer tu capacidad para crear una pequeña aplicación funcional en un límite de tiempo. A continuación, encontrarás las funciones, los requisitos y los puntos clave que debés tener en cuenta durante el desarrollo.
+---
 
-## Qué queremos que hagas:
+## Clonación del repositorio
+Clonar el repositorio en el entorno local:
 
-- El Challenge consiste en crear una aplicación web sencilla que permita a los usuarios crear y mantener una lista de tareas.
-- La entrega del resultado será en un nuevo fork de este repo y deberás hacer una pequeña demo del funcionamiento y desarrollo del proyecto ante un super comité de las más grandes mentes maestras de Invera, o a un par de devs, lo que sea más fácil de conseguir.
-- Podes contactarnos en caso que tengas alguna consulta.
+```bash
+git clone <https://github.com/Anibal-Reinoso/todo-challenge>
+cd task_manager
+```
 
-## Objetivos:
+###  Asignar permisos al script de setup
+El proyecto incluye un script .setup.sh para crear un entorno virtual con Python 3 e instalar dependencias.
+Primero, otorgue permisos de ejecución:
+```bash
+chmod +x .setup.sh
+```
+### Ejecutar el script de setup
+Este comando configurará el entorno virtual y cargará las dependencias de requirements.txt:
+```bash
+./.setup.sh
+```
+### Ejecución con Docker Compose
+Levantar la aplicación con:
+```bash
+docker compose up
+```
+# Credenciales por defecto
+### Usuario administrador:
+```bash
+Usuario: usuario1
+Contraseña: password123
+```
 
-El usuario de la aplicación tiene que ser capaz de:
+# Endpoints principales
+Frontend: http://localhost:8000
 
-- Autenticarse
-- Crear una tarea
-- Eliminar una tarea
-- Marcar tareas como completadas
-- Poder ver una lista de todas las tareas existentes
-- Filtrar/buscar tareas por fecha de creación y/o por el contenido de la misma
+API REST: http://localhost:8000/api
 
-## Qué evaluamos:
+Panel de administración: http://localhost:8000/admin
 
-- Desarrollo utilizando Python, Django. No es necesario crear un Front-End, pero sí es necesario tener una API que permita cumplir con los objetivos de arriba.
-- Uso de librerías y paquetes estandares que reduzcan la cantidad de código propio añadido.
-- Calidad y arquitectura de código. Facilidad de lectura y mantenimiento del código. Estándares seguidos.
-- [Bonus] Manejo de logs.
-- [Bonus] Creación de tests (unitarias y de integración)
-- [Bonus] Unificar la solución propuesta en una imagen de Docker por repositorio para poder ser ejecutada en cualquier ambiente (si aplica para full stack).
-
-## Requerimientos de entrega:
-
-- Hacer un fork del proyecto y pushearlo en github. Puede ser privado.
-- La solución debe correr correctamente.
-- El Readme debe contener todas las instrucciones para poder levantar la aplicación, en caso de ser necesario, y explicar cómo se usa.
-- Disponibilidad para realizar una pequeña demo del proyecto al finalizar el challenge.
-- Tiempo para la entrega: Aproximadamente 7 días.
+# Arquitectura del sistema
+![Diagrama de arquitectura](docs/diagrama.png)

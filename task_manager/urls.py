@@ -13,7 +13,7 @@ urlpatterns = [
     path('tasks/<int:task_id>/delete/', views.TaskDeleteView.as_view(), name='task_delete'),
 
     # login modal
-    path('login/form/', views.login_form_view, name='login_form'),
-    path('login-submit/', views.login_submit_view, name='login_submit'),
-    path('logout/', views.logout_view, name='logout_view'),
+    path('login/form/', views.LoginView.as_view(), name='login_form'),
+    path('login-submit/', views.LoginView.as_view(), name='login_submit'),
+    path('logout/', views.LogoutView.as_view(), name='logout_view'),
 ]
